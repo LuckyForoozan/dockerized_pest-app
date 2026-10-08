@@ -574,3 +574,24 @@ axes[2].tick_params(axis='x', rotation=45)
 
 plt.tight_layout()
 plt.show()
+# ---- MLflow logging ----
+import mlflow
+mlflow.set_experiment("pest-prediction")
+
+all_results = {
+    "results0": results0,
+    "results1": results1,
+    "results2": results2,
+    "results4": results4,
+}
+
+for group, results in all_results.items():
+    for model_name, (mae, mse, r2) in results.items():
+        with mlflow.start_run(run_name=f"{group}-{model_name}"):
+            mlflow.log_metric("MAE", mae)
+            mlflow.log_metric("MSE", mse)
+            mlflow.log_metric("R2", r2)
+
+# ---- Save best model ----
+import joblib
+joblib.dump(xgb_reg, "mlruns/best_model.pkl")
