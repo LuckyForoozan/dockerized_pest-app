@@ -595,3 +595,18 @@ for group, results in all_results.items():
 # ---- Save best model ----
 import joblib
 joblib.dump(xgb_reg, "mlruns/best_model.pkl")
+
+import os
+import pandas as pd
+
+rows = [
+    {"Group": group, "Model": model_name, "MAE": mae, "MSE": mse, "R2": r2}
+    for group, results in all_results.items()
+    for model_name, (mae, mse, r2) in results.items()
+]
+
+df_results = pd.DataFrame(rows).sort_values("R2", ascending=False).reset_index(drop=True)
+
+os.makedirs("outputs", exist_ok=True)
+print(df_results.round(4).to_string(index=False))
+df_results.to_csv("outputs/results_table.csv", index=False)
